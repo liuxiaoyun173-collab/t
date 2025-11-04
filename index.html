@@ -114,6 +114,13 @@
             opacity: 0.8;
         }
         
+        .countdown-edit {
+            margin-top: 10px;
+            font-size: 0.8rem;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        
         .nav-tabs {
             display: flex;
             overflow-x: auto;
@@ -205,6 +212,21 @@
         
         .album-item:hover img {
             transform: scale(1.05);
+        }
+        
+        .album-upload {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #f5f5f5;
+            border: 2px dashed #ccc;
+            cursor: pointer;
+        }
+        
+        .album-upload span {
+            font-size: 2rem;
+            margin-bottom: 5px;
         }
         
         /* 音乐播放器样式 */
@@ -335,43 +357,7 @@
             margin: 5px 0;
         }
         
-        /* 响应式设计 */
-        @media (max-width: 360px) {
-            .album-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .app-title {
-                font-size: 1.3rem;
-            }
-            
-            .avatar-container {
-                width: 80px;
-                height: 80px;
-            }
-        }
-        
-        @media (min-width: 768px) {
-            .app-container {
-                max-width: 500px;
-            }
-        }
-        
-        .no-select {
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            -khtml-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
-        
-        .empty-state {
-            text-align: center;
-            padding: 30px;
-            color: var(--light-text);
-        }
-        
+        /* 模态框样式 */
         .modal {
             display: none;
             position: fixed;
@@ -408,6 +394,57 @@
             font-size: 1.5rem;
             cursor: pointer;
         }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .file-label {
+            display: block;
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 360px) {
+            .album-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .app-title {
+                font-size: 1.3rem;
+            }
+            
+            .avatar-container {
+                width: 80px;
+                height: 80px;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .app-container {
+                max-width: 500px;
+            }
+        }
+        
+        .no-select {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: var(--light-text);
+        }
     </style>
 </head>
 <body>
@@ -416,7 +453,7 @@
             <div class="avatar-container" id="avatar-container">
                 <img class="avatar-img" id="avatar-img" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZmY5YTllIi8+CiAgPHBhdGggZD0iTTUwLDgwIEMzMCw2MCAxMCw0MCA1MCwyMCBDOTAsNDAgNzAsNjAgNTAsODAgWiIgZmlsbD0iI2ZmNmI5MyIvPgo8L3N2Zz4=" alt="头像">
                 <div class="avatar-upload" id="avatar-upload">+</div>
-                <input type="file" id="avatar-input" accept="image/*" style="display: none;">
+                <input type="file" id="avatar-input" class="file-input" accept="image/*">
             </div>
             <h1 class="app-title">我们的专属空间</h1>
             <p class="app-subtitle">记录我们的点点滴滴</p>
@@ -439,6 +476,7 @@
                     <div class="countdown-label">秒</div>
                 </div>
             </div>
+            <div class="countdown-edit" id="edit-countdown">编辑倒计时</div>
         </header>
         
         <nav class="nav-tabs">
@@ -447,7 +485,6 @@
             <div class="nav-tab" data-tab="diary">日记</div>
             <div class="nav-tab" data-tab="expense">记账</div>
             <div class="nav-tab" data-tab="travel">旅行计划</div>
-            <div class="nav-tab" data-tab="countdowns">倒计时</div>
         </nav>
         
         <main>
@@ -533,123 +570,118 @@
                     <!-- 旅行计划内容将通过JavaScript动态加载 -->
                 </div>
             </section>
-            
-            <!-- 倒计时部分 -->
-            <section id="countdowns" class="content-section">
-                <div class="section-title">
-                    <span>重要日期</span>
-                    <button class="add-btn" id="add-countdown-btn">+</button>
-                </div>
-                <div id="countdowns-container">
-                    <!-- 倒计时内容将通过JavaScript动态加载 -->
-                </div>
-            </section>
         </main>
     </div>
     
-    <!-- 模态框 -->
-    <div class="modal" id="photo-modal">
-        <div class="modal-content">
-                <div class="modal-header">
-                    <h3>添加照片</h3>
-                    <button class="close-modal">&times;</button>
-                </div>
-                <div class="form-group">
-                    <label for="photo-url">照片URL或Base64编码</label>
-                    <textarea id="photo-url" class="form-control" rows="3" placeholder="粘贴照片的URL或Base64编码"></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="photo-desc">照片描述</label>
-                    <input type="text" id="photo-desc" class="form-control" placeholder="为照片添加描述">
-                </div>
-                <button class="btn" id="save-photo-btn">保存照片</button>
-            </div>
-    </div>
-    
-    <div class="modal" id="music-modal">
-        <div class="modal-content">
-                <div class="modal-header">
-                    <h3>添加音乐</h3>
-                    <button class="close-modal">&times;</button>
-                </div>
-                <div class="form-group">
-                    <label for="music-title">歌曲标题</label>
-                    <input type="text" id="music-title" class="form-control" placeholder="歌曲名称">
-                </div>
-                <div class="form-group">
-                    <label for="music-artist">歌手</label>
-                    <input type="text" id="music-artist" class="form-control" placeholder="歌手名称">
-                </div>
-                <div class="form-group">
-                    <label for="music-url">音乐URL</label>
-                    <input type="text" id="music-url" class="form-control" placeholder="音乐文件链接">
-                </div>
-                <button class="btn" id="save-music-btn">保存音乐</button>
-            </div>
-    </div>
-    
-    <div class="modal" id="diary-modal">
-        <div class="modal-content">
-                <div class="modal-header">
-                    <h3>写日记</h3>
-                    <button class="close-modal">&times;</button>
-                </div>
-                <div class="form-group">
-                    <label for="diary-title">日记标题</label>
-                    <input type="text" id="diary-title" class="form-control" placeholder="日记标题">
-                </div>
-                <div class="form-group">
-                    <label for="diary-content">日记内容</label>
-                    <textarea id="diary-content" class="form-control" rows="5" placeholder="记录今天的心情和故事"></textarea>
-                </div>
-                <button class="btn" id="save-diary-btn">保存日记</button>
-            </div>
-    </div>
-    
-    <div class="modal" id="travel-modal">
-        <div class="modal-content">
-                <div class="modal-header">
-                    <h3>添加旅行计划</h3>
-                    <button class="close-modal">&times;</button>
-                </div>
-                <div class="form-group">
-                    <label for="travel-destination">目的地</label>
-                    <input type="text" id="travel-destination" class="form-control" placeholder="想去的地方">
-                </div>
-                <div class="form-group">
-                    <label for="travel-date">计划日期</label>
-                    <input type="date" id="travel-date" class="form-control">
-                </div>
-                <div class="form-group">
-                    <label for="travel-details">计划详情</label>
-                    <textarea id="travel-details" class="form-control" rows="3" placeholder="旅行计划和想法"></textarea>
-                </div>
-                <button class="btn" id="save-travel-btn">保存计划</button>
-            </div>
-    </div>
-    
+    <!-- 倒计时编辑模态框 -->
     <div class="modal" id="countdown-modal">
         <div class="modal-content">
-                <div class="modal-header">
-                    <h3>添加重要日期</h3>
-                    <button class="close-modal">&times;</button>
-                </div>
-                <div class="form-group">
-                    <label for="countdown-title">事件名称</label>
-                    <input type="text" id="countdown-title" class="form-control" placeholder="例如：纪念日、生日等">
-                </div>
-                <div class="form-group">
-                    <label for="countdown-date">日期</label>
-                    <input type="date" id="countdown-date" class="form-control">
-                </div>
-                <button class="btn" id="save-countdown-btn">保存日期</button>
+            <div class="modal-header">
+                <h3>设置重要日期</h3>
+                <button class="close-modal">&times;</button>
             </div>
+            <div class="form-group">
+                <label for="countdown-title">事件名称</label>
+                <input type="text" id="countdown-title" class="form-control" placeholder="例如：纪念日、生日等" value="我们的纪念日">
+            </div>
+            <div class="form-group">
+                <label for="countdown-date">日期</label>
+                <input type="date" id="countdown-date" class="form-control" value="2024-12-25">
+            </div>
+            <button class="btn" id="save-countdown-btn">保存日期</button>
+        </div>
+    </div>
+    
+    <!-- 照片上传模态框 -->
+    <div class="modal" id="photo-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>添加照片</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="photo-upload" class="file-label">选择照片</label>
+                <input type="file" id="photo-upload" class="file-input" accept="image/*" multiple>
+            </div>
+            <div class="form-group">
+                <label for="photo-desc">照片描述</label>
+                <input type="text" id="photo-desc" class="form-control" placeholder="为照片添加描述">
+            </div>
+            <button class="btn" id="save-photo-btn">保存照片</button>
+        </div>
+    </div>
+    
+    <!-- 音乐添加模态框 -->
+    <div class="modal" id="music-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>添加音乐</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="music-title">歌曲标题</label>
+                <input type="text" id="music-title" class="form-control" placeholder="歌曲名称">
+            </div>
+            <div class="form-group">
+                <label for="music-artist">歌手</label>
+                <input type="text" id="music-artist" class="form-control" placeholder="歌手名称">
+            </div>
+            <div class="form-group">
+                <label for="music-url">音乐URL</label>
+                <input type="text" id="music-url" class="form-control" placeholder="音乐文件链接">
+            </div>
+            <button class="btn" id="save-music-btn">保存音乐</button>
+        </div>
+    </div>
+    
+    <!-- 日记添加模态框 -->
+    <div class="modal" id="diary-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>写日记</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="diary-title">日记标题</label>
+                <input type="text" id="diary-title" class="form-control" placeholder="日记标题">
+            </div>
+            <div class="form-group">
+                <label for="diary-content">日记内容</label>
+                <textarea id="diary-content" class="form-control" rows="5" placeholder="记录今天的心情和故事"></textarea>
+            </div>
+            <button class="btn" id="save-diary-btn">保存日记</button>
+        </div>
+    </div>
+    
+    <!-- 旅行计划模态框 -->
+    <div class="modal" id="travel-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>添加旅行计划</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="travel-destination">目的地</label>
+                <input type="text" id="travel-destination" class="form-control" placeholder="想去的地方">
+            </div>
+            <div class="form-group">
+                <label for="travel-date">计划日期</label>
+                <input type="date" id="travel-date" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="travel-details">计划详情</label>
+                <textarea id="travel-details" class="form-control" rows="3" placeholder="旅行计划和想法"></textarea>
+            </div>
+            <button class="btn" id="save-travel-btn">保存计划</button>
+        </div>
     </div>
 
     <script>
         // 数据存储和管理
         const AppData = {
             // 从localStorage加载数据或使用默认数据
+            avatar: localStorage.getItem('coupleAvatar') || "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZmY5YTllIi8+CiAgPHBhdGggZD0iTTUwLDgwIEMzMCw2MCAxMCw0MCA1MCwyMCBDOTAsNDAgNzAsNjAgNTAsODAgWiIgZmlsbD0iI2ZmNmI5MyIvPgo8L3N2Zz4=",
+            
             photos: JSON.parse(localStorage.getItem('couplePhotos')) || [
                 {
                     id: 1,
@@ -687,22 +719,20 @@
                 }
             ],
             
-            countdowns: JSON.parse(localStorage.getItem('coupleCountdowns')) || [
-                {
-                    id: 1,
-                    title: "我们的纪念日",
-                    date: "2024-12-25"
-                }
-            ],
+            countdown: JSON.parse(localStorage.getItem('coupleCountdown')) || {
+                title: "我们的纪念日",
+                date: "2024-12-25"
+            },
             
             // 保存数据到localStorage
             saveData: function() {
+                localStorage.setItem('coupleAvatar', this.avatar);
                 localStorage.setItem('couplePhotos', JSON.stringify(this.photos));
                 localStorage.setItem('coupleSongs', JSON.stringify(this.songs));
                 localStorage.setItem('coupleDiaries', JSON.stringify(this.diaries));
                 localStorage.setItem('coupleExpenses', JSON.stringify(this.expenses));
                 localStorage.setItem('coupleTravelPlans', JSON.stringify(this.travelPlans));
-                localStorage.setItem('coupleCountdowns', JSON.stringify(this.countdowns));
+                localStorage.setItem('coupleCountdown', JSON.stringify(this.countdown));
             },
             
             // 生成新ID
@@ -729,6 +759,35 @@
             });
         }
         
+        // 初始化头像上传
+        function initAvatarUpload() {
+            const avatarInput = document.getElementById('avatar-input');
+            const avatarImg = document.getElementById('avatar-img');
+            const avatarUpload = document.getElementById('avatar-upload');
+            
+            avatarUpload.addEventListener('click', () => {
+                avatarInput.click();
+            });
+            
+            avatarInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        avatarImg.src = e.target.result;
+                        AppData.avatar = e.target.result;
+                        AppData.saveData();
+                    };
+                    
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            // 加载保存的头像
+            avatarImg.src = AppData.avatar;
+        }
+        
         // 初始化相册
         function initAlbum() {
             const albumContainer = document.getElementById('album-container');
@@ -739,6 +798,20 @@
             }
             
             albumContainer.innerHTML = '';
+            
+            // 添加上传按钮
+            const uploadItem = document.createElement('div');
+            uploadItem.className = 'album-item album-upload';
+            uploadItem.innerHTML = `
+                <span>+</span>
+                <div>添加照片</div>
+            `;
+            uploadItem.addEventListener('click', () => {
+                document.getElementById('photo-modal').style.display = 'flex';
+            });
+            albumContainer.appendChild(uploadItem);
+            
+            // 添加照片
             AppData.photos.forEach(photo => {
                 const albumItem = document.createElement('div');
                 albumItem.className = 'album-item';
@@ -862,41 +935,6 @@
             });
         }
         
-        // 初始化倒计时
-        function initCountdowns() {
-            const countdownsContainer = document.getElementById('countdowns-container');
-            
-            if (AppData.countdowns.length === 0) {
-                countdownsContainer.innerHTML = '<div class="empty-state">还没有重要日期，点击+添加第一个日期</div>';
-                return;
-            }
-            
-            countdownsContainer.innerHTML = '';
-            AppData.countdowns.forEach(countdown => {
-                const countdownItem = document.createElement('div');
-                countdownItem.className = 'travel-plan';
-                
-                const targetDate = new Date(countdown.date);
-                const now = new Date();
-                const timeDiff = targetDate - now;
-                
-                let statusText = '';
-                if (timeDiff > 0) {
-                    const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-                    statusText = `还有 ${days} 天`;
-                } else {
-                    statusText = '已过去';
-                }
-                
-                countdownItem.innerHTML = `
-                    <div class="travel-date">${countdown.date}</div>
-                    <div class="travel-destination">${countdown.title}</div>
-                    <div>${statusText}</div>
-                `;
-                countdownsContainer.appendChild(countdownItem);
-            });
-        }
-        
         // 显示照片详情
         function showPhotoDetail(id) {
             const photo = AppData.photos.find(p => p.id === id);
@@ -905,39 +943,32 @@
             }
         }
         
-        // 头像上传功能
-        function initAvatarUpload() {
-            const avatarInput = document.getElementById('avatar-input');
-            const avatarImg = document.getElementById('avatar-img');
-            const avatarUpload = document.getElementById('avatar-upload');
+        // 更新倒计时
+        function updateCountdown() {
+            const targetDate = new Date(AppData.countdown.date);
+            const now = new Date();
+            const timeLeft = targetDate - now;
             
-            avatarUpload.addEventListener('click', () => {
-                avatarInput.click();
-            });
-            
-            avatarInput.addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    
-                    reader.onload = function(e) {
-                        avatarImg.src = e.target.result;
-                        // 保存到localStorage
-                        localStorage.setItem('coupleAvatar', e.target.result);
-                    };
-                    
-                    reader.readAsDataURL(file);
-                }
-            });
-            
-            // 加载保存的头像
-            const savedAvatar = localStorage.getItem('coupleAvatar');
-            if (savedAvatar) {
-                avatarImg.src = savedAvatar;
+            if (timeLeft < 0) {
+                document.getElementById("countdown-days").textContent = "0";
+                document.getElementById("countdown-hours").textContent = "0";
+                document.getElementById("countdown-minutes").textContent = "0";
+                document.getElementById("countdown-seconds").textContent = "0";
+                return;
             }
+            
+            const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+            
+            document.getElementById("countdown-days").textContent = days;
+            document.getElementById("countdown-hours").textContent = hours;
+            document.getElementById("countdown-minutes").textContent = minutes;
+            document.getElementById("countdown-seconds").textContent = seconds;
         }
         
-        // 模态框管理
+        // 初始化模态框
         function initModals() {
             const modals = document.querySelectorAll('.modal');
             const closeButtons = document.querySelectorAll('.close-modal');
@@ -958,33 +989,64 @@
                 }
             });
             
+            // 编辑倒计时
+            document.getElementById('edit-countdown').addEventListener('click', () => {
+                document.getElementById('countdown-title').value = AppData.countdown.title;
+                document.getElementById('countdown-date').value = AppData.countdown.date;
+                document.getElementById('countdown-modal').style.display = 'flex';
+            });
+            
+            // 保存倒计时
+            document.getElementById('save-countdown-btn').addEventListener('click', () => {
+                const title = document.getElementById('countdown-title').value;
+                const date = document.getElementById('countdown-date').value;
+                
+                if (title && date) {
+                    AppData.countdown = {
+                        title: title,
+                        date: date
+                    };
+                    AppData.saveData();
+                    updateCountdown();
+                    document.getElementById('countdown-modal').style.display = 'none';
+                    alert('倒计时已更新！');
+                } else {
+                    alert('请填写完整的日期信息');
+                }
+            });
+            
             // 添加照片按钮
             document.getElementById('add-photo-btn').addEventListener('click', () => {
                 document.getElementById('photo-modal').style.display = 'flex';
             });
             
-            // 保存照片
-            document.getElementById('save-photo-btn').addEventListener('click', () => {
-                const url = document.getElementById('photo-url').value;
-                const desc = document.getElementById('photo-desc').value;
-                
-                if (url && desc) {
-                    const newPhoto = {
-                        id: AppData.generateId(AppData.photos),
-                        src: url,
-                        caption: desc
-                    };
+            // 照片上传
+            document.getElementById('photo-upload').addEventListener('change', function(e) {
+                const files = e.target.files;
+                if (files.length > 0) {
+                    const desc = document.getElementById('photo-desc').value || '我们的照片';
                     
-                    AppData.photos.push(newPhoto);
-                    AppData.saveData();
-                    initAlbum();
+                    Array.from(files).forEach(file => {
+                        const reader = new FileReader();
+                        
+                        reader.onload = function(e) {
+                            const newPhoto = {
+                                id: AppData.generateId(AppData.photos),
+                                src: e.target.result,
+                                caption: desc
+                            };
+                            
+                            AppData.photos.push(newPhoto);
+                            AppData.saveData();
+                            initAlbum();
+                        };
+                        
+                        reader.readAsDataURL(file);
+                    });
+                    
                     document.getElementById('photo-modal').style.display = 'none';
-                    
-                    // 清空表单
-                    document.getElementById('photo-url').value = '';
                     document.getElementById('photo-desc').value = '';
-                } else {
-                    alert('请填写完整的照片信息');
+                    alert(`成功添加了 ${files.length} 张照片！`);
                 }
             });
             
@@ -1111,76 +1173,17 @@
                     alert('请填写完整的旅行计划信息');
                 }
             });
-            
-            // 添加倒计时按钮
-            document.getElementById('add-countdown-btn').addEventListener('click', () => {
-                document.getElementById('countdown-modal').style.display = 'flex';
-            });
-            
-            // 保存倒计时
-            document.getElementById('save-countdown-btn').addEventListener('click', () => {
-                const title = document.getElementById('countdown-title').value;
-                const date = document.getElementById('countdown-date').value;
-                
-                if (title && date) {
-                    const newCountdown = {
-                        id: AppData.generateId(AppData.countdowns),
-                        title: title,
-                        date: date
-                    };
-                    
-                    AppData.countdowns.push(newCountdown);
-                    AppData.saveData();
-                    initCountdowns();
-                    document.getElementById('countdown-modal').style.display = 'none';
-                    
-                    // 清空表单
-                    document.getElementById('countdown-title').value = '';
-                    document.getElementById('countdown-date').value = '';
-                } else {
-                    alert('请填写完整的日期信息');
-                }
-            });
-        }
-        
-        // 更新倒计时
-        function updateCountdown() {
-            // 使用第一个倒计时日期作为主要倒计时
-            if (AppData.countdowns.length > 0) {
-                const targetDate = new Date(AppData.countdowns[0].date);
-                const now = new Date();
-                const timeLeft = targetDate - now;
-                
-                if (timeLeft < 0) {
-                    document.getElementById("countdown-days").textContent = "0";
-                    document.getElementById("countdown-hours").textContent = "0";
-                    document.getElementById("countdown-minutes").textContent = "0";
-                    document.getElementById("countdown-seconds").textContent = "0";
-                    return;
-                }
-                
-                const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-                
-                document.getElementById("countdown-days").textContent = days;
-                document.getElementById("countdown-hours").textContent = hours;
-                document.getElementById("countdown-minutes").textContent = minutes;
-                document.getElementById("countdown-seconds").textContent = seconds;
-            }
         }
         
         // 页面加载完成后初始化
         window.addEventListener('load', function() {
             initTabs();
+            initAvatarUpload();
             initAlbum();
             initMusicPlayer();
             initDiary();
             initExpense();
             initTravelPlans();
-            initCountdowns();
-            initAvatarUpload();
             initModals();
             
             // 更新倒计时
@@ -1200,3 +1203,4 @@
     </script>
 </body>
 </html>
+
